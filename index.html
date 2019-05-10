@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+	<meta name="viewport" content="width=device-width">
+<!-- Material Design -->
+        <script defer src="https://code.getmdl.io/1.3.0/material.min.js"></script>
+        <script src="https://code.getmdl.io/1.3.0/material.min.js"></script>
+        <link rel="stylesheet" href="https://code.getmdl.io/1.3.0/material.cyan-light_blue.min.css">
+        <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons">    
+    <script src="https://code.jquery.com/jquery-3.1.1.min.js"></script>
+</head>
+  <style>
+      #map {
+            height: 400px;;  /* The height is 400 pixels */
+            width: 100%;  /* The width is the width of the web page */
+        }
+    </style>
+<body>
+    
+   <!--Map Page--> 
+    <h1 class="mdc-typography--headline1">Veronica Cruz</h1>
+<div class= "content" id= "map">
+<a id="search" class="mdl-navigation__link" style="margin-top: 25px; margin-left: 15px;"><i class="material-icons" role="presentation">search</i>Click this button</a>
+
+</div>
+    
+</body>
+    <!--Data Script-->
+    <script>  
+$(document).ready(function(){
+
+    
+       $("#search").on("click", function() {   
+          
+var endpoint = "https://data.cityofchicago.org/resource/9rg7-mz9y.json";
+$.get('https://data.cityofchicago.org/resource/9rg7-mz9y.json'), function(data) {
+  console.log(data);
+       };
+           
+       });
+});
+            
+    </script>
+    <!--GoogleMapsKey-->
+    <script>
+        //Initialize and add the map
+        function initMap() {
+            // The location of Chicago
+            var uluru = {lat: 41.8781, lng: -87.6298};
+            // The map, centered at Chicago
+            var map = new google.maps.Map(
+                document.getElementById('map'), {zoom: 13, center: uluru});
+            // The marker, positioned at Chicago
+            infoWindow = new google.maps.InfoWindow;
+            if (navigator.geolocation) {
+                navigator.geolocation.getCurrentPosition(function(position) {
+                    var pos = {
+                        lat: position.coords.latitude,
+                        lng: position.coords.longitude
+                    };
+                    infoWindow.setPosition(pos);
+                    infoWindow.setContent('Current Location');
+                    infoWindow.open(map);
+                    var request = {
+                        location: pos,
+                        radius: '500',
+                        query: 'pet store'
+                    };
+                    service = new google.maps.places.PlacesService(map);
+                    service.textSearch(request, callback);
+                    function callback(results, status) {
+                        if (status == google.maps.places.PlacesServiceStatus.OK) {
+                            for (var i = 0; i < results.length; i++) {
+                                var place = results[i];
+                                createMarkers(results);
+                                //console.log(results[i]);
+                            }
+                        }
+                    }
+                    function createMarkers(places) {
+                        var bounds = new google.maps.LatLngBounds();
+                        var placesList = document.getElementById('places');
+                        for (var i = 0, place; place = places[i]; i++) {
+                            var marker = new google.maps.Marker({
+                                map: map,
+                                title: place.name,
+                                position: place.geometry.location
+                            });
+                            bounds.extend(place.geometry.location);
+                        }
+                        map.fitBounds(bounds);
+                        map.setCenter(pos);
+                        map.setZoom(13);
+                    }
+                }, function() {
+                    handleLocationError(true, infoWindow, map.getCenter());
+                });
+            } else {
+                // Browser doesn't support Geolocation
+                handleLocationError(false, infoWindow, map.getCenter());
+            }
+        }
+    </script>
+    <script async defer src="https://maps.googleapis.com/maps/api/js?key=AIzaSyCsmyrEvpVzsnsrMvCjsPRxGzgWf6qbgQo&libraries=places&callback=initMap"></script>
+
+</html>
